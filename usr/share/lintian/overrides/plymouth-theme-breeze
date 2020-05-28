@@ -1,0 +1,2 @@
+# Necessary for live session magic to pull the necessary theme files into RAM
+plymouth-theme-breeze: systemd-service-file-refers-to-unusual-wantedby-target lib/systemd/system/casper-stop-breeze-plymouth.service capser-stop.service

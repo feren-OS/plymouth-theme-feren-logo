@@ -1,0 +1,21 @@
+Use of the plymouth theme
+-------------------------
+
+To use the feren plymouth theme run:
+ sudo plymouth-set-default-theme feren
+
+You might need to update your initrd image with:
+ sudo update-initramfs -u
+
+Also, make sure you are passing the "splash" bootparam to your kernel, if you
+are using grub you can edit /etc/default/grub and modify the
+GRUB_CMDLINE_LINUX_DEFAULT variable. For example:
+ GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+and run:
+ sudo update-grub
+afterwards to regenerate the grub configuration files.
+
+For more information, please check the /usr/share/doc/plymouth/README.Debian
+file shipped with the plymouth package, and the plymouth-set-default-theme(1)
+manpage.
+

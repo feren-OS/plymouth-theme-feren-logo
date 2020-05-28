@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Feren OS
+Description=A Feren OS Splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/feren
+ScriptFile=/usr/share/plymouth/themes/feren/feren.script

@@ -1,0 +1,7 @@
+[Plymouth Theme]
+Name=Feren OS (Text Mode)
+Description=A Feren OS splash for text mode
+ModuleName=feren-text
+
+[breeze-text]
+title=Feren OS
