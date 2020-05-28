@@ -1,0 +1,62 @@
+#!/bin/sh -e
+
+
+
+error()
+{
+    RET=$?
+    MSG=$1
+    echo "E: $MSG";
+    exit $RET
+}
+
+if [ -e /usr/share/plymouth/themes/ ]; then
+    THEMEDIR=/usr/share/plymouth/themes/
+else
+    THEMEDIR=/lib/plymouth/themes/
+fi
+
+case "$1" in
+    configure)
+        if [ -e /usr/share/plymouth/themes/ ]; then
+            #plymouth themes moved here in xenial
+            THEMEDIR=/usr/share/plymouth/themes/
+            update-alternatives --remove default.plymouth /lib/plymouth/themes/feren/feren.plymouth || true
+            update-alternatives --remove text.plymouth /lib/plymouth/themes/feren-text/feren-text.plymouth || true
+        else
+            THEMEDIR=/lib/plymouth/themes/
+        fi
+
+        update-alternatives \
+            --install ${THEMEDIR}default.plymouth default.plymouth \
+            ${THEMEDIR}feren/feren.plymouth 300 || error "Failed to update-alternatives"
+        update-alternatives \
+            --install ${THEMEDIR}text.plymouth text.plymouth \
+            ${THEMEDIR}feren-text/feren-text.plymouth 300 \
+            || error "Failed to update-alternatives text.plymouth"
+            
+        if [ "$(realpath -L /etc/alternatives/default.plymouth)" = "/usr/share/plymouth/themes/feren-logo/feren-logo.plymouth" ]; then
+            #Old Feren OS Plymouth detected
+            update-alternatives \
+            --set default.plymouth \
+            ${THEMEDIR}feren/feren.plymouth || error "Failed to update-alternatives"
+            update-alternatives \
+            --set text.plymouth \
+            ${THEMEDIR}feren/feren-text.plymouth || error "Failed to update-alternatives"
+        fi
+
+        if which update-initramfs >/dev/null 2>&1; then
+            update-initramfs -u || error "Failed to update-initramfs"
+        fi
+        ;;
+
+    abort-upgrade|abort-deconfigure|abort-remove)
+        ;;
+
+    *)
+        echo "$0 called with unknown argument \`$1'" 1>&2
+        exit 1
+        ;;
+esac
+
+exit 0

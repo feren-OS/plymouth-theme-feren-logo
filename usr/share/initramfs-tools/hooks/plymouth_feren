@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# Copyright 2018 Harald Sitter <sitter@kde.org>
+# Copyright 2020 The Feren OS Dev <ferenosdev@outlook.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of
+# the License or (at your option) version 3 or any later version
+# accepted by the membership of KDE e.V. (or its successor approved
+# by the membership of KDE e.V.), which shall act as a proxy
+# defined in Section 14 of version 3 of the license.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Rips out ubuntu stuff and replace it with feren stuff.
+#
+# The base hook (=plymouth) does:
+# - copy all runtime files into location
+# - copy all themes AND their plugins
+# - copies ubuntu-logo theme and sets up pango (copies font and font configs)
+#
+# For the purpose of neon we'll want to roll back as much of that as possible
+# as we only use the feren plymouth themes which support both KMS and !KMS.
+
+OPTION=FRAMEBUFFER
+PREREQ="plymouth"
+
+prereqs()
+{
+	echo "${PREREQ}"
+}
+
+case "${1}" in
+	prereqs)
+		prereqs
+		exit 0
+		;;
+esac
+
+. /usr/share/initramfs-tools/hook-functions
+
+THEME_PATH="$(update-alternatives --query default.plymouth 2>/dev/null | sed -e '/^Value:/!d' -e 's/^Value: \(.*\)/\1/')"
+THEME="$(basename ${THEME_PATH:-none} .plymouth || true)"
+
+case "${THEME}" in
+	feren|feren-text)
+		# Drop ubuntu logo. We have no use for it.
+		rm -f ${DESTDIR}/usr/share/plymouth/ubuntu-logo.png
+		# Also drop all preview images. They are only used for the KCM.
+		rm -f ${DESTDIR}/usr/share/plymouth/themes/*/preview.png
+	;;
+esac
